@@ -20,7 +20,7 @@ CLIENTS = [];
 
 // an "app" is much like Express.js apps with URL routes,
 // here we handle WebSocket traffic on the wildcard "/*" route
-const app = uWS.SSLApp({}).ws('/ws', {
+const app = uWS./*SSL*/App({key_file_name: "/privatekey.pem", cert_file_name: "/certificate.pem"}).ws('/ws', {
     compression: 0,
     maxPayloadLength: 16 * 1024 * 1024,
     idleTimeout: 0,
