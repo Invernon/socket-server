@@ -1,20 +1,26 @@
+
+const MESSAGE_ENUM = Object.freeze({
+  SELF_CONNECTED: "SELF_CONNECTED",
+  CLIENT_CONNECTED: "CLIENT_CONNECTED",
+  CLIENT_DISCONNECTED: "CLIENT_DISCONNECTED",
+  CLIENT_MESSAGE: "CLIENT_MESSAGE",
+});
+
 (function () {
     "use strict";
   
     let connection;
   
-    const enableAndDisableButtons = (connected) => {
-      document.getElementById('start').disabled = connected;
-      document.getElementById('say-hello').disabled = !connected;
-      document.getElementById('close').disabled = !connected;
-    }
-  
     const setupWebSocketConnection = () => {
-      connection = new WebSocket('ws://localhost:1337');
+      connection = new WebSocket('wss://192.168.0.162:8080');
   
       connection.onopen = () => {
-        addMessageToConsole('You are now connected!');
-        enableAndDisableButtons(true);
+        alert('CONNECTED')
+        let msg = {
+          type: 'CLIENT_CONNECTED',
+          body: 'Connected'
+        }
+        connection.send( JSON.stringify(msg) );
       };
   
       connection.onerror = error => {
@@ -22,8 +28,8 @@
       };
   
       connection.onmessage = message => {
-        const data = JSON.parse(message.data);
-        addMessageToConsole(`Client${data.client} says: ${data.text}`)
+        console.log( message )
+        // addMessageToConsole(`Client${data.client} says: ${data.text}`)
       };
     }
   
@@ -31,14 +37,7 @@
       connection.close();
       addMessageToConsole('You disconnected!');
       enableAndDisableButtons(false);
-    }
-  
-    const addMessageToConsole = message => {
-      const messageDiv = document.createElement('div');
-      messageDiv.textContent = message;
-      document.getElementById('console').appendChild(messageDiv);
-    }
-  
+    }  
   
     document.addEventListener('click', async event => {
       if (event.target.id === 'start') {

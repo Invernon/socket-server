@@ -2,7 +2,7 @@ const uWS = require('uWebSockets.js');
 // uWebSockets.js is binary by default
 const { StringDecoder } = require('string_decoder');
 const decoder = new TextDecoder('utf8');
-const port = 5000;
+const port = 8080;
 
 const MESSAGE_ENUM = Object.freeze({
     SELF_CONNECTED: "SELF_CONNECTED",
@@ -17,10 +17,12 @@ let wsTimeout = null;
 
 CLIENTS = [];
 
+let settings = { key_file_name: "misc/key.pem", cert_file_name: "misc/cert.pem", passphrase: '1234' }
 
 // an "app" is much like Express.js apps with URL routes,
 // here we handle WebSocket traffic on the wildcard "/*" route
-const app = uWS./*SSL*/App({key_file_name: "/privatekey.pem", cert_file_name: "/certificate.pem"}).ws('/ws', {
+
+const app = uWS.SSLApp(settings).ws('/*', {
     compression: 0,
     maxPayloadLength: 16 * 1024 * 1024,
     idleTimeout: 0,
@@ -147,7 +149,6 @@ app.listen(port, (listenSocket) => {
         console.log(`Listening to port ${port}`) :
         console.log(`Failed to listen to port ${port}`);
 })
-
 
 // functions to help us generate random usernames
 function getRandomInt() {
