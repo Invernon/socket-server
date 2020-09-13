@@ -2,7 +2,7 @@ const uWS = require('uWebSockets.js');
 // uWebSockets.js is binary by default
 const { StringDecoder } = require('string_decoder');
 const decoder = new TextDecoder('utf8');
-const port = 7777;
+const port = 5000;
 
 const MESSAGE_ENUM = Object.freeze({
     SELF_CONNECTED: "SELF_CONNECTED",
@@ -20,7 +20,9 @@ CLIENTS = [];
 
 // an "app" is much like Express.js apps with URL routes,
 // here we handle WebSocket traffic on the wildcard "/*" route
-const app = uWS.SSLApp({}).ws('/ws', {
+
+const app = uWS./*SSL*/App(
+    {key_file_name: "/privatekey.pem", cert_file_name: "/cert.pem"}).ws('/*', {
     compression: 0,
     maxPayloadLength: 16 * 1024 * 1024,
     idleTimeout: 0,
