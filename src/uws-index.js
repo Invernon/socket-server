@@ -2,7 +2,7 @@ const uWS = require('uWebSockets.js');
 // uWebSockets.js is binary by default
 const { StringDecoder } = require('string_decoder');
 const decoder = new TextDecoder('utf8');
-const port = 7777;
+const port = 5000;
 
 const MESSAGE_ENUM = Object.freeze({
     SELF_CONNECTED: "SELF_CONNECTED",
