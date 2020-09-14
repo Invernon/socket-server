@@ -37,7 +37,7 @@ wss.on('connection', function connection(ws) {
 
     // Clients on server
     CLIENTS.push(ws);
-
+    
     // indicate message type so the client can filter with a switch statement later on
     let selfMsg = {
         type: MESSAGE_ENUM.SELF_CONNECTED,
