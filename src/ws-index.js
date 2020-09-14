@@ -4,7 +4,7 @@ const WebSocket = require('ws');
 // uWebSockets.js is binary by default
 const { StringDecoder } = require('string_decoder');
 const decoder = new TextDecoder('utf8');
-const port = 8080;
+const port = 5000;
 
 const MESSAGE_ENUM = Object.freeze({
     SELF_CONNECTED: "SELF_CONNECTED",
@@ -19,7 +19,6 @@ let wsTimeout = null;
 
 CLIENTS = [];
 
-let settings = { key_file_name: "misc/key.pem", cert_file_name: "misc/cert.pem", passphrase: '1234' }
 const server = https.createServer({
     cert: fs.readFileSync('src/misc/cert.pem'),
     key: fs.readFileSync('src/misc/key.pem')
@@ -28,18 +27,55 @@ const server = https.createServer({
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', function connection(ws) {
-    
+
+
+    ws.id = Math.random() * 1000;
+    ws.username = createName(getRandomInt());
+
+    // Clients on server
+    CLIENTS.push(ws);
+
+    // indicate message type so the client can filter with a switch statement later on
+    let selfMsg = {
+        type: MESSAGE_ENUM.SELF_CONNECTED,
+        body: {
+            id: ws.id,
+            name: ws.username
+        }
+    }
+
+    let pubMsg = {
+        type: MESSAGE_ENUM.CLIENT_CONNECTED,
+        body: {
+            id: ws.id,
+            name: ws.username
+        }
+    }
+
+    // send to connecting socket only
+    ws.send(JSON.stringify(selfMsg));
+
     ws.on('message', function incoming(message) {
-      console.log('received: %s', message);
+
+        console.log(message);
+        // decode message from client
+        // let clientMsg = JSON.parse(decoder.decode(message));
+        let serverMsg = {};
+
+        wss.clients.forEach(function each(client) {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+
+        //   console.log('received: %s', message);
     });
-   
-    ws.send('something');
 });
 
 server.listen(port, (listenSocket) => {
-        listenSocket ?
-            console.log(`Listening to port ${port}`) :
-            console.log(`Failed to listen to port ${port}`);
+    listenSocket ?
+        console.log(`Listening to port ${port}`) :
+        console.log(`Failed to listen to port ${port}`);
 })
 
 // const app = uWS.SSLApp(settings).ws('/*', {
