@@ -3,6 +3,8 @@ const https = require('https');
 const WebSocket = require('ws');
 // uWebSockets.js is binary by default
 const { StringDecoder } = require('string_decoder');
+const socketIoStream = require('socket.io-stream');
+const { client } = require('websocket');
 const decoder = new TextDecoder('utf8');
 const port = 5000;
 
@@ -28,9 +30,10 @@ const wss = new WebSocket.Server({ server });
 
 wss.on('connection', function connection(ws) {
 
-
+    console.log('new Connection');
     ws.id = Math.random() * 1000;
     ws.username = createName(getRandomInt());
+    // ws.isMaster = false;
 
     // Clients on server
     CLIENTS.push(ws);
@@ -59,8 +62,25 @@ wss.on('connection', function connection(ws) {
 
         console.log(message);
         // decode message from client
-        // let clientMsg = JSON.parse(decoder.decode(message));
-        let serverMsg = {};
+        // let clientMsg = JSON.parse(message);
+        // let serverMsg = {};
+
+        // if (clientMsg.type && clientMsg.type === 'REQUEST_MASTER') {
+        //     wss.clients.forEach(function each(client) {
+        //         if (client !== ws && client.readyState === WebSocket.OPEN) {
+        //             client.send(message);
+        //         }
+        //     });
+
+        //     CLIENTS.find(e => e.name === clientMsg.body).send({
+        //         type: 'YOU_ARE_MASTER',
+        //         body: {
+        //             master: true
+        //         } 
+        //     });
+        // } else {
+
+        // }
 
         wss.clients.forEach(function each(client) {
             if (client !== ws && client.readyState === WebSocket.OPEN) {
@@ -68,14 +88,13 @@ wss.on('connection', function connection(ws) {
             }
         });
 
+
         //   console.log('received: %s', message);
     });
 });
 
 server.listen(port, (listenSocket) => {
-    listenSocket ?
-        console.log(`Listening to port ${port}`) :
-        console.log(`Failed to listen to port ${port}`);
+    console.log(`Listening to port ${port}`)
 })
 
 // const app = uWS.SSLApp(settings).ws('/*', {
